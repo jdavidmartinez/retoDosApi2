@@ -11,7 +11,12 @@ app.use(bodyParser.urlencoded({extended: false}))
 const {Persona} = require('./sequelize')
 
 app.get('/personas', (req, res)=>{
-    res.send('GET /personas');
+    Persona.findAll()
+    .then(personas => {
+        console.log('datos enviados')
+       res.send(personas);
+    })
+    
 })
 
 app.post('/personas/nuevo', (req,res)=>{
@@ -27,15 +32,36 @@ app.post('/personas/nuevo', (req,res)=>{
 })
 
 app.get('/personas/:id', (req, res)=>{
-    res.send('GET /personas/:id');
+    let personaId = req.params.id
+    Persona.findOne({ where: {id: personaId }})
+    .then(persona => {
+        res.json(persona)
+    })
+    
 })
 
 app.put('/personas/:id', (req, res)=>{
+    let personaId = req.params.id
+    let nuevosDatos = req.body
+    Persona.findOne({ where: {id: personaId }})
+    .then( persona => {
+        persona.update(nuevosDatos)
+        .then(nuevaPersona => {
+            res.json(nuevaPersona )
+        })
+    })
     res.send('PUT /personas/:id');
 })
 
 app.delete('/personas/:id', (req, res)=>{
-    res.send('DELETE /personas/:id');
+    let personaId = req.params.id
+
+    Persona.destroy({
+        where: { id: personaId} })
+        .then(() => {
+            res.send('Persona Eliminada')
+        })
+   // res.send('DELETE /personas/:id');
 })  
 
 
